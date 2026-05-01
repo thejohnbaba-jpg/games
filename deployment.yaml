@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: tictactoe
-        image: thejohnbaba/tictactoe:latest
+        image: thejohnbaba/tictactoe:1
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
