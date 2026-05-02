@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "thejohnbaba/tictactoe:${BUILD_NUMBER}"
+        IMAGE = "thejohnbaba/tictactoe:${BRANCH_NAME}-${BUILD_NUMBER}"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -37,10 +38,27 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh '''
-                kubectl set image deployment/tictactoe tictactoe=$IMAGE
-                kubectl rollout status deployment/tictactoe
-                '''
+                script {
+
+                    if (env.BRANCH_NAME == 'main') {
+                        sh '''
+                        echo "Deploying to PROD..."
+
+                        kubectl apply -f k8/prod/
+                        kubectl set image deployment/tictactoe-prod tictactoe=$IMAGE
+                        kubectl rollout status deployment/tictactoe-prod
+                        '''
+                    } else {
+                        sh '''
+                        echo "Deploying to DEV..."
+
+                        kubectl apply -f k8/dev/
+                        kubectl set image deployment/tictactoe-dev tictactoe=$IMAGE
+                        kubectl rollout status deployment/tictactoe-dev
+                        '''
+                    }
+
+                }
             }
         }
     }
