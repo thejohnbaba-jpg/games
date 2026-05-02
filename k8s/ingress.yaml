@@ -5,6 +5,8 @@ metadata:
   name: tictactoe-ingress
 
 spec:
+  ingressClassName: nginx
+
   rules:
   - http:
       paths:
