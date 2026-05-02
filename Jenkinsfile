@@ -45,7 +45,7 @@ pipeline {
                         echo "Deploying to PROD..."
 
                         kubectl apply -f k8/prod/
-                        kubectl set image deployment/tictactoe-prod tictactoe=$IMAGE
+                        kubectl set image deployment/tictactoe-prod tictactoe-prod=$IMAGE
                         kubectl rollout status deployment/tictactoe-prod
                         '''
                     } else {
@@ -53,7 +53,7 @@ pipeline {
                         echo "Deploying to DEV..."
 
                         kubectl apply -f k8/dev/
-                        kubectl set image deployment/tictactoe-dev tictactoe=$IMAGE
+                        kubectl set image deployment/tictactoe-dev tictactoe-dev=$IMAGE
                         kubectl rollout status deployment/tictactoe-dev
                         '''
                     }
