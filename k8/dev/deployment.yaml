@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metaData:
+  name: tictactoe-dev
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tictactoe-dev
+
+    template:
+      metadata:
+        labels:
+          app: tictactoe-dev
+      spec:
+        containers:
+          - name: tictactoe
+            image: thejohnbaba/tictactoe:latest
+            imagePullPolicy: Always
+            ports:
+              - containerPort: 80
+
+
