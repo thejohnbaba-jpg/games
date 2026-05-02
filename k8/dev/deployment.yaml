@@ -17,8 +17,8 @@ spec:
           app: tictactoe-dev
       spec:
         containers:
-          - name: tictactoe
-            image: thejohnbaba/tictactoe:latest
+          - name: tictactoe-dev
+            image: thejohnbaba/tictactoe-dev:latest
             imagePullPolicy: Always
             ports:
               - containerPort: 80
