@@ -36,46 +36,58 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Setup Ingress Controller (One-time Safe)') {
+            steps {
+                sh '''
+                echo "🔧 Setting up Ingress Controller..."
+
+                # Namespace
+                kubectl apply -f k8s/ingress-controller/namespace.yaml
+
+                # ServiceAccount
+                kubectl apply -f k8s/ingress-controller/serviceaccount.yaml
+
+                # Controller Deployment
+                kubectl apply -f k8s/ingress-controller/controller.yaml
+
+                # Controller Service
+                kubectl apply -f k8s/ingress-controller/service.yaml
+                '''
+            }
+        }
+       stage('Deploy Application') {
             steps {
                 script {
 
                     if (env.BRANCH_NAME == 'main') {
-                        sh """
-                        echo "Deploying to PROD..."
 
-                        # Replace image dynamically
+                        sh """
+                        echo "🚀 Deploying to PROD..."
+
                         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/prod/deployment.yaml
 
-                        # Apply PROD configs
                         kubectl apply -f k8s/prod/
+                        kubectl apply -f k8s/ingress/
 
-                        # Apply ingress (shared)
-                        kubectl apply -f k8s/ingress.yaml
-
-                        # Wait for rollout
                         kubectl rollout status deployment/tictactoe-prod
                         """
+
                     } else {
+
                         sh """
                         echo "🚀 Deploying to DEV..."
 
-                        # Replace image dynamically
                         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/dev/deployment.yaml
 
-                        # Apply DEV configs
                         kubectl apply -f k8s/dev/
+                        kubectl apply -f k8s/ingress/
 
-                        # Apply ingress (shared)
-                        kubectl apply -f k8s/ingress.yaml
-
-                        # Wait for rollout
                         kubectl rollout status deployment/tictactoe-dev
                         """
-                    }
 
+                    }
                 }
             }
-        }
+       }
     }
 }
