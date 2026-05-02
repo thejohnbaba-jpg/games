@@ -6,7 +6,7 @@ metadata:
 
 spec:
   selector:
-    name: tictactoe-dev
+    app: tictactoe-dev
 
   ports:
     - protocol: TCP
