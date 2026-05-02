@@ -1,30 +1,26 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
-
 metadata:
   name: tictactoe-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
-
   rules:
-  - http:
-      paths:
+    - http:
+        paths:
+          - path: /dev(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: tictactoe-dev-service
+                port:
+                  number: 80
 
-      - path: /dev
-        pathType: Prefix
-        backend:
-          service:
-            name: tictactoe-dev-service
-            port:
-              number: 80
-
-      - path: /prod
-        pathType: Prefix
-        backend:
-          service:
-            name: tictactoe-prod-service
-            port:
-              number: 80
+          - path: /prod(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: tictactoe-prod-service
+                port:
+                  number: 80
