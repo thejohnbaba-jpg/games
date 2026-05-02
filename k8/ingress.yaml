@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: tictactoe-ingress
+
+spec:
+  rules:
+  - http:
+      paths:
+
+      - path: /dev
+        pathType: Prefix
+        backend:
+          service:
+            name: tictactoe-dev-service
+            port:
+              number: 80
+
+      - path: /prod
+        pathType: Prefix
+        backend:
+          service:
+            name: tictactoe-prod-service
+            port:
+              number: 80

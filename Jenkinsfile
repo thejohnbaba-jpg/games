@@ -41,21 +41,37 @@ pipeline {
                 script {
 
                     if (env.BRANCH_NAME == 'main') {
-                        sh '''
+                        sh """
                         echo "Deploying to PROD..."
 
-                        kubectl apply -f k8/prod/
-                        kubectl set image deployment/tictactoe-prod tictactoe-prod=$IMAGE
-                        kubectl rollout status deployment/tictactoe-prod
-                        '''
-                    } else {
-                        sh '''
-                        echo "Deploying to DEV..."
+                        # Replace image dynamically
+                        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/prod/deployment.yaml
 
-                        kubectl apply -f k8/dev/
-                        kubectl set image deployment/tictactoe-dev tictactoe-dev=$IMAGE
+                        # Apply PROD configs
+                        kubectl apply -f k8s/prod/
+
+                        # Apply ingress (shared)
+                        kubectl apply -f k8s/ingress.yaml
+
+                        # Wait for rollout
+                        kubectl rollout status deployment/tictactoe-prod
+                        """
+                    } else {
+                        sh """
+                        echo "🚀 Deploying to DEV..."
+
+                        # Replace image dynamically
+                        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/dev/deployment.yaml
+
+                        # Apply DEV configs
+                        kubectl apply -f k8s/dev/
+
+                        # Apply ingress (shared)
+                        kubectl apply -f k8s/ingress.yaml
+
+                        # Wait for rollout
                         kubectl rollout status deployment/tictactoe-dev
-                        '''
+                        """
                     }
 
                 }
